@@ -17,16 +17,37 @@
 import webapp2
 import caesar # three previous functions being recycled
 
+header = "<h1> Ara's Web Caesar App </h1>"
+
+def build_page(textarea_content):
+    rot_label = "<label>Rotate by how many numbers? </label>"
+    rotation_input = "<input type='number' name='rotation_number'/>"
+
+    message_label = "<label>Please type any message: </label>"
+    textarea = "<textarea name='message_textarea' style='height: 50px; width: 200px;'>" + textarea_content + "</textarea>"
+
+    submit_label = "<label>Now click submit and watch the action! "
+    submit = "<input type='submit' name='mess'/>"
+    form = ("<form method='post' action='/'>" +
+            rot_label + rotation_input + "<br><br>" +
+            message_label + textarea + "<br><br>" +
+            submit_label + submit +
+            "</form>")
+    return header + form
+
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        message  = "Ara!"
-        encrypted_message = caesar.encrypt(message, 2)
+        content = build_page("(type anything in here)")
+        self.response.write(content)
 
+    def post(self):
+        message = self.request.get("message_textarea")
+        num = int(self.request.get("rotation_number"))
+        encrypted_message = caesar.encrypt(message, num)
 
-        textarea = "<textarea>" + encrypted_message + "</textarea>"
-        submit = "<input type='submit'/>"
-        form = "<form>" + textarea + "<br>" + submit + "</form>"
-        self.response.write(form)
+        content = build_page(encrypted_message)
+        self.response.write(content)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
