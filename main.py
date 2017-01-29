@@ -16,9 +16,11 @@
 #
 import webapp2
 import caesar # three previous functions being recycled
+import cgi
 
 header = "<h1> Ara's Web Caesar App </h1>"
 
+# this is what I want to show on the get and post pages, keeping the code dry
 def build_page(textarea_content):
     rot_label = "<label>Rotate by how many numbers? </label>"
     rotation_input = "<input type='number' name='rotation_number'/>"
@@ -35,7 +37,7 @@ def build_page(textarea_content):
             "</form>")
     return header + form
 
-
+# the initial place we go
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         content = build_page("(type anything in here)")
@@ -45,8 +47,9 @@ class MainHandler(webapp2.RequestHandler):
         message = self.request.get("message_textarea")
         num = int(self.request.get("rotation_number"))
         encrypted_message = caesar.encrypt(message, num)
+        escaped_message = cgi.escape(encrypted_message) # so we dont have to deal with < > stuff messing things up
 
-        content = build_page(encrypted_message)
+        content = build_page(escaped_message)
         self.response.write(content)
 
 app = webapp2.WSGIApplication([
