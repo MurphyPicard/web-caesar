@@ -16,7 +16,7 @@
 #
 import webapp2
 import caesar # three previous functions being recycled
-import cgi
+import cgi # so we dont have to deal with < > stuff messing things up
 
 header = "<h1> Ara's Web Caesar App </h1>"
 
@@ -30,28 +30,33 @@ def build_page(textarea_content):
 
     submit_label = "<label>Now click submit and watch the action! "
     submit = "<input type='submit' name='mess'/>"
+
     form = ("<form method='post' action='/'>" +
             rot_label + rotation_input + "<br><br>" +
             message_label + textarea + "<br><br>" +
             submit_label + submit +
             "</form>")
+
     return header + form
 
-# the initial place we go
+
 class MainHandler(webapp2.RequestHandler):
+
+    # the initial place we go
     def get(self):
         content = build_page("(type anything in here)")
         self.response.write(content)
 
+    # where we go to see the message via the form method
     def post(self):
         message = self.request.get("message_textarea")
         num = int(self.request.get("rotation_number"))
         encrypted_message = caesar.encrypt(message, num)
-        escaped_message = cgi.escape(encrypted_message) # so we dont have to deal with < > stuff messing things up
+        escaped_message = cgi.escape(encrypted_message)
 
         content = build_page(escaped_message)
         self.response.write(content)
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler) # the only route I'm using for this app
 ], debug=True)
